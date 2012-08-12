@@ -3,9 +3,10 @@ package com.gamadu.starwarrior.systems;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.artemis.utils.TrigLUT;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
@@ -17,14 +18,14 @@ public class MovementSystem extends EntityProcessingSystem {
 	private ComponentMapper<Transform> transformMapper;
 
 	public MovementSystem(GameContainer container) {
-		super(Transform.class, Velocity.class);
+		super(Aspect.getAspectFor(Transform.class, Velocity.class));
 		this.container = container;
 	}
 
 	@Override
 	public void initialize() {
-		velocityMapper = new ComponentMapper<Velocity>(Velocity.class, world);
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		velocityMapper = world.getMapper(Velocity.class);
+		transformMapper = world.getMapper(Transform.class);
 	}
 
 	@Override

@@ -1,3 +1,4 @@
 syntax: glob
 build.xml
 deploy.properties
+bin/

@@ -3,9 +3,10 @@ package com.gamadu.starwarrior.systems;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.artemis.utils.Bag;
 import com.gamadu.starwarrior.components.SpatialForm;
 import com.gamadu.starwarrior.components.Transform;
@@ -23,7 +24,7 @@ public class RenderSystem extends EntityProcessingSystem {
 	private GameContainer container;
 
 	public RenderSystem(GameContainer container) {
-		super(Transform.class, SpatialForm.class);
+		super(Aspect.getAspectFor(Transform.class, SpatialForm.class));
 		this.container = container;
 		this.graphics = container.getGraphics();
 
@@ -32,8 +33,8 @@ public class RenderSystem extends EntityProcessingSystem {
 
 	@Override
 	public void initialize() {
-		spatialFormMapper = new ComponentMapper<SpatialForm>(SpatialForm.class, world);
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		spatialFormMapper = world.getMapper(SpatialForm.class);
+		transformMapper = world.getMapper(Transform.class);
 	}
 
 	@Override

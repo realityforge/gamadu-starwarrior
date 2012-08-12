@@ -2,9 +2,10 @@ package com.gamadu.starwarrior.systems;
 
 import org.newdawn.slick.GameContainer;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.components.Enemy;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
@@ -15,14 +16,15 @@ public class EnemyShipMovementSystem extends EntityProcessingSystem {
 	private ComponentMapper<Velocity> velocityMapper;
 
 	public EnemyShipMovementSystem(GameContainer container) {
-		super(Transform.class, Enemy.class, Velocity.class);
+		super(Aspect.getAspectFor(Transform.class, Enemy.class, Velocity.class));
+
 		this.container = container;
 	}
 
 	@Override
 	public void initialize() {
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
-		velocityMapper = new ComponentMapper<Velocity>(Velocity.class, world);
+		transformMapper = world.getMapper(Transform.class);
+		velocityMapper = world.getMapper(Velocity.class);
 	}
 
 	@Override

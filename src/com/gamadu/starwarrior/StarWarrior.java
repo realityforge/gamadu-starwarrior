@@ -10,8 +10,8 @@ import org.newdawn.slick.SlickException;
 
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
-import com.artemis.SystemManager;
 import com.artemis.World;
+import com.artemis.managers.GroupManager;
 import com.gamadu.starwarrior.components.Health;
 import com.gamadu.starwarrior.components.Player;
 import com.gamadu.starwarrior.components.SpatialForm;
@@ -32,17 +32,10 @@ public class StarWarrior extends BasicGame {
 
 	private World world;
 	private GameContainer container;
-	
+
 	private EntitySystem renderSystem;
 	private EntitySystem hudRenderSystem;
-	private EntitySystem controlSystem;
-	private EntitySystem movementSystem;
-	private EntitySystem enemyShooterSystem;
-	private EntitySystem enemyShipMovementSystem;
-	private EntitySystem collisionSystem;
 	private EntitySystem healthBarRenderSystem;
-	private EntitySystem enemySpawnSystem;
-	private EntitySystem expirationSystem;
 
 	public StarWarrior() {
 		super("Star Warrior");
@@ -53,20 +46,21 @@ public class StarWarrior extends BasicGame {
 		this.container = container;
 
 		world = new World();
+		world.setManager(new GroupManager());
 
-		SystemManager systemManager = world.getSystemManager();
-		renderSystem = systemManager.setSystem(new RenderSystem(container));
-		hudRenderSystem = systemManager.setSystem(new HudRenderSystem(container));
-		controlSystem = systemManager.setSystem(new MovementSystem(container));
-		movementSystem = systemManager.setSystem(new PlayerShipControlSystem(container));
-		enemyShooterSystem = systemManager.setSystem(new EnemyShipMovementSystem(container));
-		enemyShipMovementSystem = systemManager.setSystem(new EnemyShooterSystem());
-		collisionSystem = systemManager.setSystem(new CollisionSystem());
-		healthBarRenderSystem = systemManager.setSystem(new HealthBarRenderSystem(container));
-		enemySpawnSystem = systemManager.setSystem(new EnemySpawnSystem(500, container));
-		expirationSystem = systemManager.setSystem(new ExpirationSystem());
+		world.setSystem(new MovementSystem(container));
+		world.setSystem(new PlayerShipControlSystem(container));
+		world.setSystem(new EnemyShipMovementSystem(container));
+		world.setSystem(new EnemyShooterSystem());
+		world.setSystem(new CollisionSystem());
+		world.setSystem(new EnemySpawnSystem(500, container));
+		world.setSystem(new ExpirationSystem());
 
-		systemManager.initializeAll();
+		renderSystem = world.setSystem(new RenderSystem(container), true);
+		hudRenderSystem = world.setSystem(new HudRenderSystem(container), true);
+		healthBarRenderSystem = world.setSystem(new HealthBarRenderSystem(container), true);
+
+		world.initialize();
 
 		initPlayerShip();
 		initEnemyShips();
@@ -77,39 +71,31 @@ public class StarWarrior extends BasicGame {
 		Random r = new Random();
 		for (int i = 0; 10 > i; i++) {
 			Entity e = EntityFactory.createEnemyShip(world);
-			
-			e.getComponent(Transform.class).setLocation(r.nextInt(container.getWidth()), r.nextInt(400)+50);
+
+			e.getComponent(Transform.class).setLocation(r.nextInt(container.getWidth()), r.nextInt(400) + 50);
 			e.getComponent(Velocity.class).setVelocity(0.05f);
 			e.getComponent(Velocity.class).setAngle(r.nextBoolean() ? 0 : 180);
 			
-			e.refresh();
+			e.addToWorld();
 		}
 	}
 
 	private void initPlayerShip() {
 		Entity e = world.createEntity();
-		e.setGroup("SHIPS");
 		e.addComponent(new Transform(container.getWidth() / 2, container.getHeight() - 40));
 		e.addComponent(new SpatialForm("PlayerShip"));
 		e.addComponent(new Health(30));
 		e.addComponent(new Player());
 		
-		e.refresh();
+		world.getManager(GroupManager.class).add(e,"SHIPS");
+		
+		world.addEntity(e);
 	}
 
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
-		world.loopStart();
-		
 		world.setDelta(delta);
-
-		controlSystem.process();
-		movementSystem.process();
-		enemyShooterSystem.process();
-		enemyShipMovementSystem.process();
-		collisionSystem.process();
-		enemySpawnSystem.process();
-		expirationSystem.process();
+		world.process();
 	}
 
 	@Override
@@ -124,9 +110,9 @@ public class StarWarrior extends BasicGame {
 		AppGameContainer container = new AppGameContainer(game);
 		container.setDisplayMode(1024, 768, false);
 		container.setAlwaysRender(true);
-		//container.setMinimumLogicUpdateInterval(1);
-		//container.setMaximumLogicUpdateInterval(1);
-		//container.setTargetFrameRate(60);
+		// container.setMinimumLogicUpdateInterval(1);
+		// container.setMaximumLogicUpdateInterval(1);
+		// container.setTargetFrameRate(60);
 		container.start();
 	}
 }

@@ -4,9 +4,10 @@ import java.util.Random;
 
 import org.newdawn.slick.GameContainer;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.IntervalEntitySystem;
+import com.artemis.systems.IntervalEntitySystem;
 import com.artemis.utils.ImmutableBag;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Enemy;
@@ -23,14 +24,14 @@ public class EnemySpawnSystem extends IntervalEntitySystem {
 	private Random r;
 
 	public EnemySpawnSystem(int interval, GameContainer container) {
-		super(interval, Transform.class, Weapon.class, Enemy.class);
+		super(Aspect.getAspectFor(Transform.class, Weapon.class, Enemy.class), interval);
 		this.container = container;
 	}
 
 	@Override
 	public void initialize() {
-		weaponMapper = new ComponentMapper<Weapon>(Weapon.class, world);
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		weaponMapper = world.getMapper(Weapon.class);
+		transformMapper = world.getMapper(Transform.class);
 		
 		r = new Random();
 	}
@@ -43,7 +44,7 @@ public class EnemySpawnSystem extends IntervalEntitySystem {
 		e.getComponent(Velocity.class).setVelocity(0.05f);
 		e.getComponent(Velocity.class).setAngle(r.nextBoolean() ? 0 : 180);
 		
-		e.refresh();
+		e.addToWorld();
 	}
 	
 }

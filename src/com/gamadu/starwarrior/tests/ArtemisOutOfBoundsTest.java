@@ -86,7 +86,7 @@ public class ArtemisOutOfBoundsTest {
 			e.addComponent(new Component15());
 			e.addComponent(new Component16());
 
-			e.refresh();
+			e.addToWorld();
 
 			e.getComponent(Component1.class);
 			e.getComponent(Component2.class);
@@ -135,7 +135,7 @@ public class ArtemisOutOfBoundsTest {
 			e.addComponent(new Component15());
 			e.addComponent(new Component16());
 
-			e.refresh();
+			e.addToWorld();
 
 			e.getComponent(Component1.class);
 			e.getComponent(Component2.class);

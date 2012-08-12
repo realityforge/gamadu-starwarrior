@@ -1,8 +1,9 @@
 package com.gamadu.starwarrior.systems;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.components.Expires;
 
 public class ExpirationSystem extends EntityProcessingSystem {
@@ -10,12 +11,12 @@ public class ExpirationSystem extends EntityProcessingSystem {
 	private ComponentMapper<Expires> expiresMapper;
 
 	public ExpirationSystem() {
-		super(Expires.class);
+		super(Aspect.getAspectFor(Expires.class));
 	}
 
 	@Override
 	public void initialize() {
-		expiresMapper = new ComponentMapper<Expires>(Expires.class, world);
+		expiresMapper = world.getMapper(Expires.class);
 	}
 
 	@Override

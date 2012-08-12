@@ -1,35 +1,36 @@
 package com.gamadu.starwarrior.systems;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
+import com.artemis.managers.GroupManager;
 import com.artemis.utils.ImmutableBag;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Health;
 import com.gamadu.starwarrior.components.Transform;
-import com.gamadu.starwarrior.components.Velocity;
 
 public class CollisionSystem extends EntitySystem {
 	private ComponentMapper<Transform> transformMapper;
-	private ComponentMapper<Velocity> velocityMapper;
 	private ComponentMapper<Health> healthMapper;
+	private ImmutableBag<Entity> bullets;
+	private ImmutableBag<Entity> ships;
 
 	public CollisionSystem() {
-		super(Transform.class);
+		super(Aspect.getAspectFor(Transform.class));
 	}
 
 	@Override
 	public void initialize() {
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
-		velocityMapper = new ComponentMapper<Velocity>(Velocity.class, world);
-		healthMapper = new ComponentMapper<Health>(Health.class, world);
+		transformMapper = world.getMapper(Transform.class);
+		healthMapper = world.getMapper(Health.class);
+
+		bullets = world.getManager(GroupManager.class).getEntities("BULLETS");
+		ships = world.getManager(GroupManager.class).getEntities("SHIPS");
 	}
 	
 	@Override
 	protected void processEntities(ImmutableBag<Entity> entities) {
-		ImmutableBag<Entity> bullets = world.getGroupManager().getEntities("BULLETS");
-		ImmutableBag<Entity> ships = world.getGroupManager().getEntities("SHIPS");
-		
 		if(bullets != null && ships != null) {
 			shipLoop: for(int a = 0; ships.size() > a; a++) {
 				Entity ship = ships.get(a);
@@ -38,7 +39,7 @@ public class CollisionSystem extends EntitySystem {
 					
 					if(collisionExists(bullet, ship)) {
 						Transform tb = transformMapper.get(bullet);
-						EntityFactory.createBulletExplosion(world, tb.getX(), tb.getY()).refresh();
+						EntityFactory.createBulletExplosion(world, tb.getX(), tb.getY()).addToWorld();
 						world.deleteEntity(bullet);
 						
 						Health health = healthMapper.get(ship);
@@ -48,7 +49,7 @@ public class CollisionSystem extends EntitySystem {
 						if(!health.isAlive()) {
 							Transform ts = transformMapper.get(ship);
 	
-							EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).refresh();
+							EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).addToWorld();
 	
 							world.deleteEntity(ship);
 							continue shipLoop;

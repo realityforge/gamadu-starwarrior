@@ -4,9 +4,10 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.components.Health;
 import com.gamadu.starwarrior.components.Player;
 
@@ -16,14 +17,14 @@ public class HudRenderSystem extends EntityProcessingSystem {
 	private ComponentMapper<Health> healthMapper;
 
 	public HudRenderSystem(GameContainer container) {
-		super(Health.class, Player.class);
+		super(Aspect.getAspectFor(Health.class, Player.class));
 		this.container = container;
 		this.g = container.getGraphics();
 	}
 
 	@Override
 	public void initialize() {
-		healthMapper = new ComponentMapper<Health>(Health.class, world);
+		healthMapper = world.getMapper(Health.class);
 	}
 
 	@Override

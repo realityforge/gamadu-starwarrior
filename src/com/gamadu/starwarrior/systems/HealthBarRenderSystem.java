@@ -4,9 +4,10 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.components.Health;
 import com.gamadu.starwarrior.components.Transform;
 
@@ -17,15 +18,15 @@ public class HealthBarRenderSystem extends EntityProcessingSystem {
 	private ComponentMapper<Transform> transformMapper;
 
 	public HealthBarRenderSystem(GameContainer container) {
-		super(Health.class, Transform.class);
+		super(Aspect.getAspectFor(Health.class, Transform.class));
 		this.container = container;
 		this.g = container.getGraphics();
 	}
 
 	@Override
 	public void initialize() {
-		healthMapper = new ComponentMapper<Health>(Health.class, world);
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		healthMapper = world.getMapper(Health.class);
+		transformMapper = world.getMapper(Transform.class);
 	}
 
 	@Override

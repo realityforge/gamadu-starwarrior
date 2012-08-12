@@ -23,10 +23,10 @@ public class Explosion extends Spatial {
 
 	@Override
 	public void initalize() {
-		ComponentMapper<Transform> transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		ComponentMapper<Transform> transformMapper = world.getMapper(Transform.class);
 		transform = transformMapper.get(owner);
 		
-		ComponentMapper<Expires> expiresMapper = new ComponentMapper<Expires>(Expires.class, world);
+		ComponentMapper<Expires> expiresMapper = world.getMapper(Expires.class);
 		expires = expiresMapper.get(owner);
 		initialLifeTime = expires.getLifeTime();
 		

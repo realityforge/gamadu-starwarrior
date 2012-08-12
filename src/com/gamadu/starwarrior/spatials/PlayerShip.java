@@ -20,7 +20,7 @@ public class PlayerShip extends Spatial {
 
 	@Override
 	public void initalize() {
-		ComponentMapper<Transform> transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		ComponentMapper<Transform> transformMapper = world.getMapper(Transform.class);
 		transform = transformMapper.get(owner);
 
 		ship = new Polygon();

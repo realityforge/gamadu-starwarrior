@@ -1,8 +1,9 @@
 package com.gamadu.starwarrior.systems;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Enemy;
 import com.gamadu.starwarrior.components.Transform;
@@ -16,13 +17,13 @@ public class EnemyShooterSystem extends EntityProcessingSystem {
 	private ComponentMapper<Transform> transformMapper;
 
 	public EnemyShooterSystem() {
-		super(Transform.class, Weapon.class, Enemy.class);
+		super(Aspect.getAspectFor(Transform.class, Weapon.class, Enemy.class));
 	}
 
 	@Override
 	public void initialize() {
-		weaponMapper = new ComponentMapper<Weapon>(Weapon.class, world);
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		weaponMapper = world.getMapper(Weapon.class);
+		transformMapper = world.getMapper(Transform.class);
 	}
 
 	@Override
@@ -32,19 +33,19 @@ public class EnemyShooterSystem extends EntityProcessingSystem {
 
 	@Override
 	protected void process(Entity e) {
-		Weapon weapon = weaponMapper.get(e);
+		process(e, weaponMapper.get(e), transformMapper.get(e));
+	}
 
+	private void process(Entity e, Weapon weapon, Transform transform) {
 		if (weapon.getShotAt() + 2000 < now) {
-			Transform transform = transformMapper.get(e);
-
+			
 			Entity missile = EntityFactory.createMissile(world);
 			missile.getComponent(Transform.class).setLocation(transform.getX(), transform.getY() + 20);
 			missile.getComponent(Velocity.class).setVelocity(-0.5f);
 			missile.getComponent(Velocity.class).setAngle(270);
-			missile.refresh();
+			missile.addToWorld();
 
 			weapon.setShotAt(now);
 		}
-
 	}
 }

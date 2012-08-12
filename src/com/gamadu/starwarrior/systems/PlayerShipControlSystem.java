@@ -4,9 +4,10 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.KeyListener;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.EntityProcessingSystem;
+import com.artemis.systems.EntityProcessingSystem;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Player;
 import com.gamadu.starwarrior.components.Transform;
@@ -20,13 +21,13 @@ public class PlayerShipControlSystem extends EntityProcessingSystem implements K
 	private ComponentMapper<Transform> transformMapper;
 
 	public PlayerShipControlSystem(GameContainer container) {
-		super(Transform.class, Player.class);
+		super(Aspect.getAspectFor(Transform.class, Player.class));
 		this.container = container;
 	}
 
 	@Override
 	public void initialize() {
-		transformMapper = new ComponentMapper<Transform>(Transform.class, world);
+		transformMapper = world.getMapper(Transform.class);
 		container.getInput().addKeyListener(this);
 	}
 
@@ -46,7 +47,7 @@ public class PlayerShipControlSystem extends EntityProcessingSystem implements K
 			missile.getComponent(Transform.class).setLocation(transform.getX(), transform.getY() - 20);
 			missile.getComponent(Velocity.class).setVelocity(-0.5f);
 			missile.getComponent(Velocity.class).setAngle(90);
-			missile.refresh();
+			missile.addToWorld();
 
 			shoot = false;
 		}
