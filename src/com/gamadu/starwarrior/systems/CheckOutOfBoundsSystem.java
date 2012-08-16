@@ -6,17 +6,16 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
-import com.gamadu.starwarrior.components.Enemy;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
 
-public class EnemyShipMovementSystem extends EntityProcessingSystem {
+public class CheckOutOfBoundsSystem extends EntityProcessingSystem {
 	private GameContainer container;
 	private ComponentMapper<Transform> transformMapper;
 	private ComponentMapper<Velocity> velocityMapper;
 
-	public EnemyShipMovementSystem(GameContainer container) {
-		super(Aspect.getAspectFor(Transform.class, Enemy.class, Velocity.class));
+	public CheckOutOfBoundsSystem(GameContainer container) {
+		super(Aspect.getAspectFor(Transform.class, Velocity.class));
 
 		this.container = container;
 	}
@@ -33,7 +32,7 @@ public class EnemyShipMovementSystem extends EntityProcessingSystem {
 		Velocity velocity = velocityMapper.get(e);
 
 		if (transform.getX() > container.getWidth() || transform.getX() < 0) {
-			velocity.addAngle(180);
+			velocity.setVx(-velocity.getVx());
 		}
 	}
 

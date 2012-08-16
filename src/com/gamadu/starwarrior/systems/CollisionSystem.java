@@ -5,6 +5,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.managers.GroupManager;
+import com.artemis.utils.Bag;
 import com.artemis.utils.ImmutableBag;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Health;
@@ -15,6 +16,7 @@ public class CollisionSystem extends EntitySystem {
 	private ComponentMapper<Health> healthMapper;
 	private ImmutableBag<Entity> bullets;
 	private ImmutableBag<Entity> ships;
+	private Bag<CollisionGroup> collisionGroups;
 
 	public CollisionSystem() {
 		super(Aspect.getAspectFor(Transform.class));
@@ -24,51 +26,99 @@ public class CollisionSystem extends EntitySystem {
 	public void initialize() {
 		transformMapper = world.getMapper(Transform.class);
 		healthMapper = world.getMapper(Health.class);
+		
+		collisionGroups = new Bag<CollisionGroup>();
+		
+		collisionGroups.add(new CollisionGroup("PLAYER_BULLETS", "ENEMY_SHIPS", new CollisionHandler() {
+			@Override
+			public void handleCollision(Entity bullet, Entity ship) {
+				Transform tb = transformMapper.get(bullet);
+				EntityFactory.createBulletExplosion(world, tb.getX(), tb.getY()).addToWorld();
+				world.deleteEntity(bullet);
+				
+				Health health = healthMapper.get(ship);
+				health.addDamage(1);
 
-		bullets = world.getManager(GroupManager.class).getEntities("BULLETS");
-		ships = world.getManager(GroupManager.class).getEntities("SHIPS");
+				
+				if(!health.isAlive()) {
+					Transform ts = transformMapper.get(ship);
+
+					EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).addToWorld();
+
+					world.deleteEntity(ship);
+				}
+			}
+		}));
+
+		collisionGroups.add(new CollisionGroup("ENEMY_BULLETS", "PLAYER_SHIPS", new CollisionHandler() {
+			@Override
+			public void handleCollision(Entity bullet, Entity ship) {
+				Transform tb = transformMapper.get(bullet);
+				EntityFactory.createBulletExplosion(world, tb.getX(), tb.getY()).addToWorld();
+				world.deleteEntity(bullet);
+				
+				Health health = healthMapper.get(ship);
+				health.addDamage(1);
+
+				
+				if(!health.isAlive()) {
+					Transform ts = transformMapper.get(ship);
+
+					EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).addToWorld();
+
+					world.deleteEntity(ship);
+				}
+			}
+		}));
 	}
 	
 	@Override
 	protected void processEntities(ImmutableBag<Entity> entities) {
-		if(bullets != null && ships != null) {
-			shipLoop: for(int a = 0; ships.size() > a; a++) {
-				Entity ship = ships.get(a);
-				for(int b = 0; bullets.size() > b; b++) {
-					Entity bullet = bullets.get(b);
-					
-					if(collisionExists(bullet, ship)) {
-						Transform tb = transformMapper.get(bullet);
-						EntityFactory.createBulletExplosion(world, tb.getX(), tb.getY()).addToWorld();
-						world.deleteEntity(bullet);
-						
-						Health health = healthMapper.get(ship);
-						health.addDamage(4);
-	
-						
-						if(!health.isAlive()) {
-							Transform ts = transformMapper.get(ship);
-	
-							EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).addToWorld();
-	
-							world.deleteEntity(ship);
-							continue shipLoop;
-						}
-					}
-				}
-			}
+		
+		for(int i = 0; collisionGroups.size() > i; i++) {
+			collisionGroups.get(i).checkForCollisions();
 		}
 	}
 
 	private boolean collisionExists(Entity e1, Entity e2) {
 		Transform t1 = transformMapper.get(e1);
 		Transform t2 = transformMapper.get(e2);
-		return t1.getDistanceTo(t2) < 15;
+		return t1.getDistanceTo(t2) < 10;
 	}
 
 	@Override
 	protected boolean checkProcessing() {
 		return true;
+	}
+	
+	
+	private class CollisionGroup {
+		private ImmutableBag<Entity> groupEntitiesA;
+		private ImmutableBag<Entity> groupEntitiesB;
+		private CollisionHandler handler;
+
+		public CollisionGroup(String group1, String group2, CollisionHandler handler) {
+			groupEntitiesA = world.getManager(GroupManager.class).getEntities(group1);
+			groupEntitiesB = world.getManager(GroupManager.class).getEntities(group2);
+			this.handler = handler;
+		}
+
+		public void checkForCollisions() {
+			for(int a = 0; groupEntitiesA.size() > a; a++) {
+				for(int b = 0; groupEntitiesB.size() > b; b++) {
+					Entity entityA = groupEntitiesA.get(a);
+					Entity entityB = groupEntitiesB.get(b);
+					if(collisionExists(entityA, entityB)) {
+						handler.handleCollision(entityA, entityB);
+					}
+				}
+			}
+			
+		}
+	}
+	
+	private interface CollisionHandler {
+		void handleCollision(Entity a, Entity b);
 	}
 
 }

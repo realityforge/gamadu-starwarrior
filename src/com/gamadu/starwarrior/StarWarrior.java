@@ -17,8 +17,8 @@ import com.gamadu.starwarrior.components.Player;
 import com.gamadu.starwarrior.components.SpatialForm;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
+import com.gamadu.starwarrior.systems.CheckOutOfBoundsSystem;
 import com.gamadu.starwarrior.systems.CollisionSystem;
-import com.gamadu.starwarrior.systems.EnemyShipMovementSystem;
 import com.gamadu.starwarrior.systems.EnemyShooterSystem;
 import com.gamadu.starwarrior.systems.EnemySpawnSystem;
 import com.gamadu.starwarrior.systems.ExpirationSystem;
@@ -50,7 +50,7 @@ public class StarWarrior extends BasicGame {
 
 		world.setSystem(new MovementSystem(container));
 		world.setSystem(new PlayerShipControlSystem(container));
-		world.setSystem(new EnemyShipMovementSystem(container));
+		world.setSystem(new CheckOutOfBoundsSystem(container));
 		world.setSystem(new EnemyShooterSystem());
 		world.setSystem(new CollisionSystem());
 		world.setSystem(new EnemySpawnSystem(500, container));
@@ -73,8 +73,7 @@ public class StarWarrior extends BasicGame {
 			Entity e = EntityFactory.createEnemyShip(world);
 
 			e.getComponent(Transform.class).setLocation(r.nextInt(container.getWidth()), r.nextInt(400) + 50);
-			e.getComponent(Velocity.class).setVelocity(0.05f);
-			e.getComponent(Velocity.class).setAngle(r.nextBoolean() ? 0 : 180);
+			e.getComponent(Velocity.class).setVx(0.05f);
 			
 			e.addToWorld();
 		}
@@ -84,10 +83,11 @@ public class StarWarrior extends BasicGame {
 		Entity e = world.createEntity();
 		e.addComponent(new Transform(container.getWidth() / 2, container.getHeight() - 40));
 		e.addComponent(new SpatialForm("PlayerShip"));
+		e.addComponent(new Velocity());
 		e.addComponent(new Health(30));
 		e.addComponent(new Player());
 		
-		world.getManager(GroupManager.class).add(e,"SHIPS");
+		world.getManager(GroupManager.class).add(e,"PLAYER_SHIP");
 		
 		world.addEntity(e);
 	}

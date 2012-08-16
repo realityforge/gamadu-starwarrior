@@ -3,43 +3,34 @@ package com.gamadu.starwarrior.components;
 import com.artemis.Component;
 
 public class Velocity extends Component {
-	private float velocity;
-	private float angle;
+	private float vx;
+	private float vy;
 
 	public Velocity() {
 	}
 
-	public Velocity(float vector) {
-		this.velocity = vector;
+	public Velocity(float vx, float vy) {
+		this.vx = vx;
+		this.vy = vy;
 	}
 
-	public Velocity(float velocity, float angle) {
-		this.velocity = velocity;
-		this.angle = angle;
+	public float getVx() {
+		return vx;
 	}
 
-	public float getVelocity() {
-		return velocity;
+	public void setVx(float vx) {
+		this.vx = vx;
 	}
 
-	public void setVelocity(float velocity) {
-		this.velocity = velocity;
+	public float getVy() {
+		return vy;
 	}
 
-	public void setAngle(float angle) {
-		this.angle = angle;
+	public void setVy(float vy) {
+		this.vy = vy;
 	}
+	
+	
 
-	public float getAngle() {
-		return angle;
-	}
-
-	public void addAngle(float a) {
-		angle = (angle + a) % 360;
-	}
-
-	public float getAngleAsRadians() {
-		return (float) Math.toRadians(angle);
-	}
 
 }

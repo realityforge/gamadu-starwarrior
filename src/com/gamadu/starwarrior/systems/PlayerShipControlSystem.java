@@ -7,51 +7,50 @@ import org.newdawn.slick.KeyListener;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.systems.EntityProcessingSystem;
+import com.artemis.systems.IntervalEntityProcessingSystem;
 import com.gamadu.starwarrior.EntityFactory;
 import com.gamadu.starwarrior.components.Player;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
 
-public class PlayerShipControlSystem extends EntityProcessingSystem implements KeyListener {
+public class PlayerShipControlSystem extends IntervalEntityProcessingSystem implements KeyListener {
 	private GameContainer container;
 	private boolean moveRight;
 	private boolean moveLeft;
 	private boolean shoot;
 	private ComponentMapper<Transform> transformMapper;
+	private ComponentMapper<Velocity> velocityMapper;
 
 	public PlayerShipControlSystem(GameContainer container) {
-		super(Aspect.getAspectFor(Transform.class, Player.class));
+		super(Aspect.getAspectFor(Transform.class, Player.class, Velocity.class), 50);
 		this.container = container;
 	}
 
 	@Override
 	public void initialize() {
 		transformMapper = world.getMapper(Transform.class);
+		velocityMapper = world.getMapper(Velocity.class);
 		container.getInput().addKeyListener(this);
 	}
 
 	@Override
 	protected void process(Entity e) {
-		Transform transform = transformMapper.get(e);
 
 		if (moveLeft) {
-			transform.addX(world.getDelta() * -0.3f);
+			velocityMapper.get(e).setVx(-0.2f);
 		}
-		if (moveRight) {
-			transform.addX(world.getDelta() * 0.3f);
+		else if (moveRight) {
+			velocityMapper.get(e).setVx(0.2f);
+		} else {
+			velocityMapper.get(e).setVx(0);
 		}
 		
 		if (shoot) {
-			Entity missile = EntityFactory.createMissile(world);
-			missile.getComponent(Transform.class).setLocation(transform.getX(), transform.getY() - 20);
-			missile.getComponent(Velocity.class).setVelocity(-0.5f);
-			missile.getComponent(Velocity.class).setAngle(90);
-			missile.addToWorld();
-
-			shoot = false;
+			Transform transform = transformMapper.get(e);
+			 EntityFactory.createPlayerMissile(world, transform.getX(), transform.getY() - 20).addToWorld();
 		}
 	}
+	
 
 	@Override
 	public void keyPressed(int key, char c) {

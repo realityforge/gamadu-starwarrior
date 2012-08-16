@@ -38,13 +38,7 @@ public class EnemyShooterSystem extends EntityProcessingSystem {
 
 	private void process(Entity e, Weapon weapon, Transform transform) {
 		if (weapon.getShotAt() + 2000 < now) {
-			
-			Entity missile = EntityFactory.createMissile(world);
-			missile.getComponent(Transform.class).setLocation(transform.getX(), transform.getY() + 20);
-			missile.getComponent(Velocity.class).setVelocity(-0.5f);
-			missile.getComponent(Velocity.class).setAngle(270);
-			missile.addToWorld();
-
+			EntityFactory.createEnemyMissile(world, transform.getX(), transform.getY() + 20).addToWorld();
 			weapon.setShotAt(now);
 		}
 	}

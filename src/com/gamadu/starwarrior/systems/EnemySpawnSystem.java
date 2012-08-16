@@ -41,8 +41,7 @@ public class EnemySpawnSystem extends IntervalEntitySystem {
 		Entity e = EntityFactory.createEnemyShip(world);
 		
 		e.getComponent(Transform.class).setLocation(r.nextInt(container.getWidth()), r.nextInt(400)+50);
-		e.getComponent(Velocity.class).setVelocity(0.05f);
-		e.getComponent(Velocity.class).setAngle(r.nextBoolean() ? 0 : 180);
+		e.getComponent(Velocity.class).setVx(0.05f);
 		
 		e.addToWorld();
 	}

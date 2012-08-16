@@ -12,15 +12,28 @@ import com.gamadu.starwarrior.components.Velocity;
 import com.gamadu.starwarrior.components.Weapon;
 
 public class EntityFactory {
-	public static Entity createMissile(World world) {
+	public static Entity createEnemyMissile(World world, float x, float y) {
 		Entity e = world.createEntity();
 		
-		e.addComponent(new Transform());
+		e.addComponent(new Transform(x,y));
 		e.addComponent(new SpatialForm("Missile"));
-		e.addComponent(new Velocity());
+		e.addComponent(new Velocity(0, 0.25f));
 		e.addComponent(new Expires(2000));
 
-		world.getManager(GroupManager.class).add(e,"BULLETS");
+		world.getManager(GroupManager.class).add(e,"ENEMY_BULLETS");
+
+		return e;
+	}
+	
+	public static Entity createPlayerMissile(World world, float x, float y) {
+		Entity e = world.createEntity();
+		
+		e.addComponent(new Transform(x,y));
+		e.addComponent(new SpatialForm("Missile"));
+		e.addComponent(new Velocity(0, -1f));
+		e.addComponent(new Expires(2000));
+
+		world.getManager(GroupManager.class).add(e,"PLAYER_BULLETS");
 
 		return e;
 	}
@@ -35,7 +48,7 @@ public class EntityFactory {
 		e.addComponent(new Enemy());
 		e.addComponent(new Velocity());
 		
-		world.getManager(GroupManager.class).add(e,"SHIPS");
+		world.getManager(GroupManager.class).add(e,"ENEMY_SHIPS");
 		
 		return e;
 	}

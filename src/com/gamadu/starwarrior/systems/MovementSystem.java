@@ -7,7 +7,6 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
-import com.artemis.utils.TrigLUT;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
 
@@ -30,17 +29,11 @@ public class MovementSystem extends EntityProcessingSystem {
 
 	@Override
 	protected void process(Entity e) {
-		Velocity velocity = velocityMapper.get(e);
-		float v = velocity.getVelocity();
+		Velocity v = velocityMapper.get(e);
+		Transform t = transformMapper.get(e);
 
-		Transform transform = transformMapper.get(e);
-
-		float r = velocity.getAngleAsRadians();
-
-		float xn = transform.getX() + (TrigLUT.cos(r) * v * world.getDelta());
-		float yn = transform.getY() + (TrigLUT.sin(r) * v * world.getDelta());
-
-		transform.setLocation(xn, yn);
+		t.addX(v.getVx()*world.getDelta());
+		t.addY(v.getVy()*world.getDelta());
 	}
 
 }

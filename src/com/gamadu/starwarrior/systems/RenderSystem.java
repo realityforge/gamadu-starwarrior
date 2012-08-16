@@ -46,6 +46,14 @@ public class RenderSystem extends EntityProcessingSystem {
 			spatial.render(graphics);
 		}
 	}
+	
+	@Override
+	protected void end() {
+		graphics.drawString("Active entities: " + world.getEntityManager().getActiveEntityCount(), 10, 25);
+		graphics.drawString("Total added to world since start: " + world.getEntityManager().getTotalAdded(), 10, 40);
+		graphics.drawString("Total created in world since start: " + world.getEntityManager().getTotalCreated(), 10, 55);
+		graphics.drawString("Total deleted from world since start: " + world.getEntityManager().getTotalDeleted(), 10, 70);
+	}
 
 	@Override
 	protected void added(Entity e) {
