@@ -21,6 +21,10 @@ public class Health extends Component {
 	public int getHealthPercentage() {
 		return Math.round(health / maximumHealth * 100f);
 	}
+	
+	public float getHealthFactor() {
+		return health/maximumHealth;
+	}
 
 	public void addDamage(int damage) {
 		health -= damage;
@@ -30,6 +34,12 @@ public class Health extends Component {
 	
 	public boolean isAlive() {
 		return health > 0;
+	}
+
+	public void addHealth(int health) {
+		this.health += health;
+		if(this.health > maximumHealth)
+			this.health = maximumHealth;
 	}
 
 }

@@ -12,8 +12,8 @@ import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.World;
 import com.artemis.managers.GroupManager;
+import com.artemis.managers.TagManager;
 import com.gamadu.starwarrior.components.Health;
-import com.gamadu.starwarrior.components.Player;
 import com.gamadu.starwarrior.components.SpatialForm;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.components.Velocity;
@@ -22,7 +22,8 @@ import com.gamadu.starwarrior.systems.CollisionSystem;
 import com.gamadu.starwarrior.systems.EnemyShooterSystem;
 import com.gamadu.starwarrior.systems.EnemySpawnSystem;
 import com.gamadu.starwarrior.systems.ExpirationSystem;
-import com.gamadu.starwarrior.systems.HealthBarRenderSystem;
+import com.gamadu.starwarrior.systems.EnemyHealthBarRenderSystem;
+import com.gamadu.starwarrior.systems.HealthPowerUpSpawnSystem;
 import com.gamadu.starwarrior.systems.HudRenderSystem;
 import com.gamadu.starwarrior.systems.MovementSystem;
 import com.gamadu.starwarrior.systems.PlayerShipControlSystem;
@@ -47,18 +48,20 @@ public class StarWarrior extends BasicGame {
 
 		world = new World();
 		world.setManager(new GroupManager());
+		world.setManager(new TagManager());
 
 		world.setSystem(new MovementSystem(container));
 		world.setSystem(new PlayerShipControlSystem(container));
 		world.setSystem(new CheckOutOfBoundsSystem(container));
 		world.setSystem(new EnemyShooterSystem());
 		world.setSystem(new CollisionSystem());
-		world.setSystem(new EnemySpawnSystem(500, container));
+		world.setSystem(new EnemySpawnSystem(750, container));
 		world.setSystem(new ExpirationSystem());
+		world.setSystem(new HealthPowerUpSpawnSystem(10000, container));
 
 		renderSystem = world.setSystem(new RenderSystem(container), true);
 		hudRenderSystem = world.setSystem(new HudRenderSystem(container), true);
-		healthBarRenderSystem = world.setSystem(new HealthBarRenderSystem(container), true);
+		healthBarRenderSystem = world.setSystem(new EnemyHealthBarRenderSystem(container), true);
 
 		world.initialize();
 
@@ -70,24 +73,19 @@ public class StarWarrior extends BasicGame {
 	private void initEnemyShips() {
 		Random r = new Random();
 		for (int i = 0; 10 > i; i++) {
-			Entity e = EntityFactory.createEnemyShip(world);
-
-			e.getComponent(Transform.class).setLocation(r.nextInt(container.getWidth()), r.nextInt(400) + 50);
-			e.getComponent(Velocity.class).setVx(0.05f);
-			
-			e.addToWorld();
+			EntityFactory.createEnemyShip(world, r.nextInt(container.getWidth()),-50, 0f, 0.05f).addToWorld();
 		}
 	}
 
 	private void initPlayerShip() {
 		Entity e = world.createEntity();
-		e.addComponent(new Transform(container.getWidth() / 2, container.getHeight() - 40));
+		e.addComponent(new Transform(container.getWidth() / 2, container.getHeight() - 50));
 		e.addComponent(new SpatialForm("PlayerShip"));
 		e.addComponent(new Velocity());
 		e.addComponent(new Health(30));
-		e.addComponent(new Player());
 		
 		world.getManager(GroupManager.class).add(e,"PLAYER_SHIP");
+		world.getManager(TagManager.class).register("PLAYER", e);
 		
 		world.addEntity(e);
 	}

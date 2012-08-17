@@ -4,6 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
+import com.artemis.Manager;
 import com.artemis.managers.GroupManager;
 import com.artemis.utils.Bag;
 import com.artemis.utils.ImmutableBag;
@@ -37,7 +38,7 @@ public class CollisionSystem extends EntitySystem {
 				world.deleteEntity(bullet);
 				
 				Health health = healthMapper.get(ship);
-				health.addDamage(1);
+				health.addDamage(5);
 
 				
 				if(!health.isAlive()) {
@@ -50,7 +51,7 @@ public class CollisionSystem extends EntitySystem {
 			}
 		}));
 
-		collisionGroups.add(new CollisionGroup("ENEMY_BULLETS", "PLAYER_SHIPS", new CollisionHandler() {
+		collisionGroups.add(new CollisionGroup("ENEMY_BULLETS", "PLAYER_SHIP", new CollisionHandler() {
 			@Override
 			public void handleCollision(Entity bullet, Entity ship) {
 				Transform tb = transformMapper.get(bullet);
@@ -68,6 +69,36 @@ public class CollisionSystem extends EntitySystem {
 
 					world.deleteEntity(ship);
 				}
+			}
+		}));
+		
+		collisionGroups.add(new CollisionGroup("ENEMY_SHIPS", "PLAYER_SHIP", new CollisionHandler() {
+			@Override
+			public void handleCollision(Entity enemy, Entity player) {
+				Transform tb = transformMapper.get(enemy);
+				EntityFactory.createShipExplosion(world, tb.getX(), tb.getY()).addToWorld();
+				world.deleteEntity(enemy);
+				
+				Health health = healthMapper.get(player);
+				health.addDamage(2);
+
+				
+				if(!health.isAlive()) {
+					Transform ts = transformMapper.get(player);
+
+					EntityFactory.createShipExplosion(world, ts.getX(), ts.getY()).addToWorld();
+
+					world.deleteEntity(player);
+				}
+			}
+		}));
+		
+		collisionGroups.add(new CollisionGroup("HEALTH_POWERUPS", "PLAYER_SHIP", new CollisionHandler() {
+			@Override
+			public void handleCollision(Entity powerup, Entity ship) {
+				Health health = healthMapper.get(ship);
+				health.addHealth(5);
+				powerup.deleteFromWorld();
 			}
 		}));
 	}

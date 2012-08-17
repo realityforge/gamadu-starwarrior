@@ -17,8 +17,8 @@ public class EntityFactory {
 		
 		e.addComponent(new Transform(x,y));
 		e.addComponent(new SpatialForm("Missile"));
-		e.addComponent(new Velocity(0, 0.25f));
-		e.addComponent(new Expires(2000));
+		e.addComponent(new Velocity(0, 0.15f));
+		e.addComponent(new Expires(8000));
 
 		world.getManager(GroupManager.class).add(e,"ENEMY_BULLETS");
 
@@ -30,7 +30,7 @@ public class EntityFactory {
 		
 		e.addComponent(new Transform(x,y));
 		e.addComponent(new SpatialForm("Missile"));
-		e.addComponent(new Velocity(0, -1f));
+		e.addComponent(new Velocity((Math.random()>0.5?-1:1)*(float)Math.random()*0.05f, -1f));
 		e.addComponent(new Expires(2000));
 
 		world.getManager(GroupManager.class).add(e,"PLAYER_BULLETS");
@@ -38,15 +38,15 @@ public class EntityFactory {
 		return e;
 	}
 	
-	public static Entity createEnemyShip(World world) {
+	public static Entity createEnemyShip(World world, int x, int y, float vx, float vy) {
 		Entity e = world.createEntity();
 		
-		e.addComponent(new Transform());
+		e.addComponent(new Transform(x, y));
 		e.addComponent(new SpatialForm("EnemyShip"));
 		e.addComponent(new Health(10));
 		e.addComponent(new Weapon());
 		e.addComponent(new Enemy());
-		e.addComponent(new Velocity());
+		e.addComponent(new Velocity(vx, vy));
 		
 		world.getManager(GroupManager.class).add(e,"ENEMY_SHIPS");
 		
@@ -73,6 +73,18 @@ public class EntityFactory {
 		e.addComponent(new Expires(1000));
 		
 		world.getManager(GroupManager.class).add(e, "EFFECTS");
+		
+		return e;
+	}
+
+	public static Entity createHealthPowerUp(World world, int x, int y, int vx, float vy) {
+		Entity e = world.createEntity();
+		
+		e.addComponent(new Transform(x, y));
+		e.addComponent(new SpatialForm("HealthPowerUp"));
+		e.addComponent(new Velocity(vx, vy));
+		
+		world.getManager(GroupManager.class).add(e,"HEALTH_POWERUPS");
 		
 		return e;
 	}

@@ -8,17 +8,18 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
+import com.gamadu.starwarrior.components.Enemy;
 import com.gamadu.starwarrior.components.Health;
 import com.gamadu.starwarrior.components.Transform;
 
-public class HealthBarRenderSystem extends EntityProcessingSystem {
+public class EnemyHealthBarRenderSystem extends EntityProcessingSystem {
 	private GameContainer container;
 	private Graphics g;
 	private ComponentMapper<Health> healthMapper;
 	private ComponentMapper<Transform> transformMapper;
 
-	public HealthBarRenderSystem(GameContainer container) {
-		super(Aspect.getAspectFor(Health.class, Transform.class));
+	public EnemyHealthBarRenderSystem(GameContainer container) {
+		super(Aspect.getAspectFor(Health.class, Transform.class, Enemy.class));
 		this.container = container;
 		this.g = container.getGraphics();
 	}
@@ -34,8 +35,11 @@ public class HealthBarRenderSystem extends EntityProcessingSystem {
 		Health health = healthMapper.get(e);
 		Transform transform = transformMapper.get(e);
 		
-		g.setColor(Color.white);
-		g.drawString(health.getHealthPercentage() + "%", transform.getX()-10, transform.getY()-30);
+		g.setColor(Color.darkGray);
+		g.fillRect(transform.getX()-10, transform.getY()-15, 20, 2);
+		
+		g.setColor(Color.red);
+		g.fillRect(transform.getX()-10, transform.getY()-15, health.getHealthFactor()*20, 2);
 	}
 
 }

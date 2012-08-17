@@ -7,17 +7,19 @@ import org.newdawn.slick.Graphics;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.artemis.systems.EntityProcessingSystem;
+import com.artemis.EntitySystem;
+import com.artemis.managers.TagManager;
+import com.artemis.utils.ImmutableBag;
 import com.gamadu.starwarrior.components.Health;
-import com.gamadu.starwarrior.components.Player;
 
-public class HudRenderSystem extends EntityProcessingSystem {
+public class HudRenderSystem extends EntitySystem {
 	private GameContainer container;
 	private Graphics g;
 	private ComponentMapper<Health> healthMapper;
+	private Entity player;
 
 	public HudRenderSystem(GameContainer container) {
-		super(Aspect.getAspectFor(Health.class, Player.class));
+		super(Aspect.getEmpty());
 		this.container = container;
 		this.g = container.getGraphics();
 	}
@@ -28,10 +30,23 @@ public class HudRenderSystem extends EntityProcessingSystem {
 	}
 
 	@Override
-	protected void process(Entity e) {
-		Health health = healthMapper.get(e);
-		g.setColor(Color.white);
-		g.drawString("Health: " + health.getHealthPercentage() + "%", 20, container.getHeight() - 40);
+	protected void processEntities(ImmutableBag<Entity> entities) {
+		player = world.getManager(TagManager.class).getEntity("PLAYER");
+		if(player != null && player.isEnabled()) {
+			Health health = healthMapper.get(player);
+			
+			g.setColor(Color.darkGray);
+			g.fillRect(container.getWidth()/2-100, container.getHeight()-20, 200, 5);
+			
+			g.setColor(Color.green);
+			int h = Math.round(health.getHealthFactor()*200);
+			g.fillRect(container.getWidth()/2-(h/2), container.getHeight()-20, h, 5);
+		}
 	}
 
+	@Override
+	protected boolean checkProcessing() {
+		return true;
+	}
+	
 }

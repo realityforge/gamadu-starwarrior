@@ -1,5 +1,6 @@
 package com.gamadu.starwarrior.systems;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -12,6 +13,7 @@ import com.gamadu.starwarrior.components.SpatialForm;
 import com.gamadu.starwarrior.components.Transform;
 import com.gamadu.starwarrior.spatials.EnemyShip;
 import com.gamadu.starwarrior.spatials.Explosion;
+import com.gamadu.starwarrior.spatials.HealthPowerUp;
 import com.gamadu.starwarrior.spatials.Missile;
 import com.gamadu.starwarrior.spatials.PlayerShip;
 import com.gamadu.starwarrior.spatials.Spatial;
@@ -49,21 +51,24 @@ public class RenderSystem extends EntityProcessingSystem {
 	
 	@Override
 	protected void end() {
+		graphics.setColor(Color.white);
 		graphics.drawString("Active entities: " + world.getEntityManager().getActiveEntityCount(), 10, 25);
 		graphics.drawString("Total added to world since start: " + world.getEntityManager().getTotalAdded(), 10, 40);
 		graphics.drawString("Total created in world since start: " + world.getEntityManager().getTotalCreated(), 10, 55);
 		graphics.drawString("Total deleted from world since start: " + world.getEntityManager().getTotalDeleted(), 10, 70);
+		graphics.drawString("Keys: A and D for movement, spacebar to shoot.", 10, 100);
+		graphics.drawString("Enable/Disable player ship entity: Q and W.", 10, 115);
 	}
 
 	@Override
-	protected void added(Entity e) {
+	protected void inserted(Entity e) {
 		Spatial spatial = createSpatial(e);
 		if (spatial != null) {
 			spatial.initalize();
 			spatials.set(e.getId(), spatial);
 		}
 	}
-
+	
 	@Override
 	protected void removed(Entity e) {
 		spatials.set(e.getId(), null);
@@ -83,6 +88,8 @@ public class RenderSystem extends EntityProcessingSystem {
 			return new Explosion(world, e, 10);
 		} else if ("ShipExplosion".equalsIgnoreCase(spatialFormFile)) {
 			return new Explosion(world, e, 30);
+		} else if ("HealthPowerUp".equalsIgnoreCase(spatialFormFile)) {
+			return new HealthPowerUp(world, e);
 		}
 
 		return null;
