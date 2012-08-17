@@ -12,6 +12,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/slick.jar" sourcepath="libs/slick-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/artemis-framework/build/artemis-d5d6c972557ca43acd420b481b9a25e570e406c4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/artemis-framework"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
